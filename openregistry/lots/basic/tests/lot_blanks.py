@@ -885,3 +885,50 @@ def lot_not_found(self):
 
     response = self.app.get('/lots/{}'.format(data['_id']), status=404)
     self.assertEqual(response.status, '404 Not Found')
+
+
+def change_lot_statuses_bot2(self):
+    response = self.app.get('/lots')
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(len(response.json['data']), 0)
+
+    self.app.authorization = ('Basic', ('bot2', ''))
+
+    inauction_lot = deepcopy(self.initial_data)
+    inauction_lot['status'] = 'active.inauction'
+    response = self.app.post_json('/lots', {'data': inauction_lot})
+    self.assertEqual(response.status, '201 Created')
+    lot = response.json['data']
+
+    self.assertEqual(lot.get('status', ''), 'active.inauction')
+
+    response = self.app.get('/lots/{}'.format(lot['id']))
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'], lot)
+
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.pending'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.inauction'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'sold'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.inauction'}}
+    )
+    self.assertEqual(response.status, '403 Forbidden')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['status'], 'error')
