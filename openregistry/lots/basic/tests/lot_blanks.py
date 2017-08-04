@@ -285,6 +285,46 @@ def create_lot(self):
     self.assertIn('{\n    "', response.body)
 
 
+def check_lot_assets(self):
+
+
+    def create_single_lot():
+        response = self.app.post_json('/lots', {"data": self.initial_data})
+        self.assertEqual(response.status, '201 Created')
+        self.assertEqual(response.content_type, 'application/json')
+        return response.json['data']
+        
+
+    # lot with a single assets
+    self.initial_data["assets"] = [uuid4().hex]
+    lot = create_single_lot()
+    response = self.app.get('/lots/{}'.format(lot['id']))
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(set(response.json['data']), set(lot))
+    self.assertEqual(response.json['data'], lot)
+
+    # lot with different assets 
+    self.initial_data["assets"] = [uuid4().hex, uuid4().hex]
+    lot = create_single_lot()
+    response = self.app.get('/lots/{}'.format(lot['id']))
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(set(response.json['data']), set(lot))
+    self.assertEqual(response.json['data'], lot)
+
+    # # this tests are not working corectly
+
+    # # lot with no assets
+    # self.initial_data["assets"] = []
+    # response = self.app.post_json('/lots', {"data": self.initial_data})
+    
+    # # lot with equal assets
+    # id_ex = uuid4().hex
+    # self.initial_data["assets"] = [id_ex, id_ex]
+    # response = self.app.post_json('/lots', {"data": self.initial_data})
+    
+
 def get_lot(self):
     response = self.app.get('/lots')
     self.assertEqual(response.status, '200 OK')
