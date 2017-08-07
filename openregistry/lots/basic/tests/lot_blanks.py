@@ -892,20 +892,42 @@ def change_lot_statuses_bot2(self):
     self.assertEqual(response.status, '200 OK')
     self.assertEqual(len(response.json['data']), 0)
 
-    self.app.authorization = ('Basic', ('bot2', ''))
+    self.app.authorization = ('Basic', ('broker', ''))
 
-    inauction_lot = deepcopy(self.initial_data)
-    inauction_lot['status'] = 'active.inauction'
-    response = self.app.post_json('/lots', {'data': inauction_lot})
+    draft_lot = deepcopy(self.initial_data)
+    draft_lot['status'] = 'draft'
+
+    response = self.app.post_json('/lots', {'data': draft_lot})
     self.assertEqual(response.status, '201 Created')
     lot = response.json['data']
-
-    self.assertEqual(lot.get('status', ''), 'active.inauction')
+    self.assertEqual(lot.get('status', ''), 'draft')
 
     response = self.app.get('/lots/{}'.format(lot['id']))
     self.assertEqual(response.status, '200 OK')
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'], lot)
+
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'waiting'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+
+    self.app.authorization = ('Basic', ('bot1', ''))
+
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.pending'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+
+    self.app.authorization = ('Basic', ('bot2', ''))
+
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.inauction'}}
+    )
+    self.assertEqual(response.status, '200 OK')
 
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
