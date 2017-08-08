@@ -21,6 +21,9 @@ from openregistry.lots.basic.tests.lot_blanks import (
     patch_lot,
     simple_add_lot,
     check_lot_assets,
+    change_delete_status_for_admin,
+    change_dissolved_status_for_admin,
+    change_sold_status_for_admin,
 )
 
 
@@ -46,6 +49,9 @@ class LotResourceTest(BaseLotWebTest):
     test_listing_draft = snitch(listing_draft)
     test_listing_changes = snitch(listing_changes)
     test_check_lot_assets = snitch(check_lot_assets)
+    test_change_delete_status_for_admin = snitch(change_delete_status_for_admin)
+    test_change_dissolved_status_for_admin = snitch(change_dissolved_status_for_admin)
+    test_change_sold_status_for_admin = snitch(change_sold_status_for_admin)
 
 
 def suite():
