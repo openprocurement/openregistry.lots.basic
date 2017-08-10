@@ -19,8 +19,9 @@ def validate_change_lot_status(request, error_handler, **kwargs):
        auth_role == STATUS_CHANGES[current_status][new_status]:
         request.validated['data'] = {'status': new_status}
     else:
-        raise_operation_error(
-            request,
-            error_handler,
-            'Can\'t update lot in current ({}) status'.format(current_status)
+        request.errors.add(
+            'body', 'lot',
+            'Can\'t update lot to ({}) status'.format(new_status)
         )
+        request.errors.status = 403
+        raise error_handler(request)
