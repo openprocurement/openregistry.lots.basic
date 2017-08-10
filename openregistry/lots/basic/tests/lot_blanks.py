@@ -291,21 +291,56 @@ def check_lot_assets(self):
     self.assertEqual(set(response.json['data']), set(lot))
     self.assertEqual(response.json['data'], lot)
 
-    # # this tests are not working corectly
+    # lot with no assets
+    empty_asset_lot = deepcopy(self.initial_data)
+    empty_asset_lot.update({
+        'status': 'draft',
+        'assets': [],
+    })
+    response = self.app.post_json(
+        '/lots',
+        {"data": empty_asset_lot},
+    )
+    self.assertEqual(response.status, '201 Created')
+    lot = response.json['data']
+    token = response.json['access']['token']
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(lot['status'], 'draft')
 
-    # # lot with no assets
-    # self.initial_data["assets"] = []
-    # response = self.app.post_json('/lots', {"data": self.initial_data})
+    response = self.app.get('/lots/{}'.format(lot['id']))
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(set(response.json['data']), set(lot))
+    self.assertEqual(response.json['data'], lot)
 
-    # # lot with equal assets
-    # id_ex = uuid4().hex
-    # self.initial_data["assets"] = [id_ex, id_ex]
-    # response = self.app.post_json('/lots', {"data": self.initial_data})
+    empty_asset_lot.update({
+        'status': 'waiting',
+    })
+    response = self.app.patch_json(
+        '/lots/{}?acc_token={}'.format(lot['id'], token),
+        {'data': empty_asset_lot},
+        status=422,
+    )
+    self.assertEqual(response.status, '422 Unprocessable Entity')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['status'], 'error')
 
-    ####################################################################
-    # TODO: fix the problem with no-assets-lot and different-assets-lot#
-    # - they should return 403 or something, not raise erorrs.         #
-    ####################################################################
+    # lot with equal assets
+    asset = uuid4().hex
+    equal_asset_lot = deepcopy(self.initial_data)
+    equal_asset_lot.update({
+        'status': 'draft',
+        'assets': [asset, asset],
+    })
+    response = self.app.post_json(
+        '/lots',
+        {"data": equal_asset_lot},
+        status=422,
+    )
+    self.assertEqual(response.status, '422 Unprocessable Entity')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['status'], 'error')
+    self.assertEqual(response.json['errors'][0]['description'][0], u'Assets should be unique')
 
 
 def get_lot(self):
