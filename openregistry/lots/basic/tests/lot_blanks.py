@@ -900,18 +900,23 @@ def change_lot_statuses_bot2(self):
     response = self.app.post_json('/lots', {'data': draft_lot})
     self.assertEqual(response.status, '201 Created')
     lot = response.json['data']
+    token = response.json['access']['token']
     self.assertEqual(lot.get('status', ''), 'draft')
-
     response = self.app.get('/lots/{}'.format(lot['id']))
     self.assertEqual(response.status, '200 OK')
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'], lot)
 
     response = self.app.patch_json(
-        '/lots/{}'.format(lot['id']),
+        '/lots/{}?acc_token={}'.format(lot['id'], token),
         {'data': {'status': 'waiting'}}
     )
     self.assertEqual(response.status, '200 OK')
+
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.json['data'].get('status'), 'waiting')
 
     self.app.authorization = ('Basic', ('bot1', ''))
 
@@ -921,6 +926,11 @@ def change_lot_statuses_bot2(self):
     )
     self.assertEqual(response.status, '200 OK')
 
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.json['data'].get('status'), 'active.pending')
+
     self.app.authorization = ('Basic', ('bot2', ''))
 
     response = self.app.patch_json(
@@ -929,17 +939,32 @@ def change_lot_statuses_bot2(self):
     )
     self.assertEqual(response.status, '200 OK')
 
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.json['data'].get('status'), 'active.inauction')
+
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
         {'data': {'status': 'active.pending'}}
     )
     self.assertEqual(response.status, '200 OK')
 
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.json['data'].get('status'), 'active.pending')
+
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
         {'data': {'status': 'active.inauction'}}
     )
     self.assertEqual(response.status, '200 OK')
+
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.json['data'].get('status'), 'active.inauction')
 
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
@@ -947,9 +972,14 @@ def change_lot_statuses_bot2(self):
     )
     self.assertEqual(response.status, '200 OK')
 
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.json['data'].get('status'), 'sold')
+
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
-        {'data': {'status': 'active.inauction'}}
+        {'data': {'status': 'active.inauction'}}, status=403
     )
     self.assertEqual(response.status, '403 Forbidden')
     self.assertEqual(response.content_type, 'application/json')
