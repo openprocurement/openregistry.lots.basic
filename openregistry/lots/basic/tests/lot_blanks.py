@@ -325,6 +325,20 @@ def check_lot_assets(self):
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['status'], 'error')
 
+    # TODO: lot with no assets in 'waiting' status
+    #       (validator for post request in openregitry.lots.core.validation)
+    # empty_asset_lot.update({
+    #     'status': 'waiting',
+    # })
+    # response = self.app.post_json(
+    #     '/lots',
+    #     {"data": empty_asset_lot},
+    # )
+    # self.assertEqual(response.status, '422 Unprocessable Entity')
+    # self.assertEqual(response.content_type, 'application/json')
+    # self.assertEqual(response.json['status'], 'error')
+    # self.assertEqual(response.json['errors'][0]['description'], u'Empty assets allowed in draft status only')
+
     # lot with equal assets
     asset = uuid4().hex
     equal_asset_lot = deepcopy(self.initial_data)
