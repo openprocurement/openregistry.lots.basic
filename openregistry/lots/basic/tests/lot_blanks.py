@@ -888,13 +888,10 @@ def lot_not_found(self):
     self.assertEqual(response.status, '404 Not Found')
 #
 #
-def change_delete_status_for_admin(self):
+def change_delete_terminated_status_for_admin(self):
     response = self.app.get('/lots')
     self.assertEqual(response.status, '200 OK')
     self.assertEqual(len(response.json['data']), 0)
-
-    self.app.authorization = ('Basic', ('broker', ''))
-
     draft_lot = deepcopy(self.initial_data)
     draft_lot['status'] = 'draft'
 
@@ -910,32 +907,38 @@ def change_delete_status_for_admin(self):
 
     self.app.authorization = ('Basic', ('administrator', ''))
 
+    # Move status from 'draft' to 'deleted' for administrator ==============
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
         {'data': {'status': 'deleted'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'deleted')
+    # =======================================================================
 
     response = self.app.get(
         '/lots/{}'.format(lot['id'])
     )
+    self.assertEqual(response.status, '200 OK')
     self.assertEqual(response.json['data'].get('status'), 'deleted')
+    self.assertEqual(response.content_type, 'application/json')
 
+    # Move status from 'deleted' to 'draft' for administrator ==============
     response = self.app.patch_json('/lots/{}'.format(
         lot['id']), {'data': {'status': 'draft'}}, status=403)
     self.assertEqual(response.status, '403 Forbidden')
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['errors'][0]['description'], u"Can't update lot in current (deleted) status")
+    # =======================================================================
 
 
-def change_dissolved_status_for_admin(self):
+def change_dissolved_terminated_status_for_admin(self):
     response = self.app.get('/lots')
     self.assertEqual(response.status, '200 OK')
     self.assertEqual(len(response.json['data']), 0)
-    self.app.authorization = ('Basic', ('broker', ''))
     draft_lot = deepcopy(self.initial_data)
     draft_lot['status'] = 'draft'
-
     response = self.app.post_json('/lots', {'data': draft_lot})
     self.assertEqual(response.status, '201 Created')
     lot = response.json['data']
@@ -949,95 +952,76 @@ def change_dissolved_status_for_admin(self):
 
     self.app.authorization = ('Basic', ('administrator', ''))
 
+    # Move status from 'draft' to 'waiting' for administrator ==============
     response = self.app.patch_json(
         '/lots/{}?acc_token={}'.format(lot['id'], token),
         {'data': {'status': 'waiting'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'waiting')
+    # =======================================================================
 
+    # Check status change for waiting  ======================================
     response = self.app.get(
         '/lots/{}'.format(lot['id'])
-    )
-    self.assertEqual(response.json['data'].get('status'), 'waiting')
-
-    response = self.app.patch_json(
-        '/lots/{}?acc_token={}'.format(lot['id'], token),
-        {'data': {'status': 'draft'}}
     )
     self.assertEqual(response.status, '200 OK')
-
-    response = self.app.get(
-        '/lots/{}'.format(lot['id'])
-    )
-    self.assertEqual(response.json['data'].get('status'), 'draft')
-
-    response = self.app.patch_json(
-        '/lots/{}?acc_token={}'.format(lot['id'], token),
-        {'data': {'status': 'waiting'}}
-    )
-    self.assertEqual(response.status, '200 OK')
-
-    response = self.app.get(
-        '/lots/{}'.format(lot['id'])
-    )
+    self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'].get('status'), 'waiting')
+    # =======================================================================
 
+    # Move status from 'waiting' to 'active.pending' for administrator ==============
     response = self.app.patch_json(
         '/lots/{}?acc_token={}'.format(lot['id'], token),
         {'data': {'status': 'active.pending'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.pending')
+    # =======================================================================
 
+    # Check status change for 'active.pending'  ======================================
     response = self.app.get(
         '/lots/{}'.format(lot['id'])
-    )
-    self.assertEqual(response.json['data'].get('status'), 'active.pending')
-
-    response = self.app.patch_json(
-        '/lots/{}?acc_token={}'.format(lot['id'], token),
-        {'data': {'status': 'waiting'}}
     )
     self.assertEqual(response.status, '200 OK')
-
-    response = self.app.get(
-        '/lots/{}'.format(lot['id'])
-    )
-    self.assertEqual(response.json['data'].get('status'), 'waiting')
-
-    response = self.app.patch_json(
-        '/lots/{}?acc_token={}'.format(lot['id'], token),
-        {'data': {'status': 'active.pending'}}
-    )
-    self.assertEqual(response.status, '200 OK')
-
-    response = self.app.get(
-        '/lots/{}'.format(lot['id'])
-    )
+    self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'].get('status'), 'active.pending')
+    # =======================================================================
 
+    # Move status from 'active.pending' to 'dissolved' for administrator ==============
     response = self.app.patch_json(
         '/lots/{}?acc_token={}'.format(lot['id'], token),
         {'data': {'status': 'dissolved'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'dissolved')
+    # =======================================================================
 
+    # Check status change for 'dissolved'  ======================================
     response = self.app.get(
         '/lots/{}'.format(lot['id'])
     )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'].get('status'), 'dissolved')
+    # =======================================================================
 
+    # Move status from 'dissolved' to 'active.pending' for administrator ==============
     response = self.app.patch_json('/lots/{}?acc_token={}'.format(
         lot['id'], token), {'data': {'status': 'active.pending'}}, status=403)
     self.assertEqual(response.status, '403 Forbidden')
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['errors'][0]['description'], u"Can't update lot in current (dissolved) status")
+    # =======================================================================
 
 
-def change_sold_status_for_admin(self):
+def change_sold_terminated_status_for_admin(self):
     response = self.app.get('/lots')
     self.assertEqual(response.status, '200 OK')
     self.assertEqual(len(response.json['data']), 0)
-    self.app.authorization = ('Basic', ('broker', ''))
     waiting_lot = deepcopy(self.initial_data)
     waiting_lot['status'] = 'waiting'
     response = self.app.post_json('/lots', {'data': waiting_lot})
@@ -1052,181 +1036,328 @@ def change_sold_status_for_admin(self):
 
     self.app.authorization = ('Basic', ('administrator', ''))
 
+    # Move status from 'waiting' to 'active.pending' for administrator ==============
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
         {'data': {'status': 'active.pending'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.pending')
+    # =======================================================================
 
+    # Check status change for 'active.pending'  ===================================
     response = self.app.get(
         '/lots/{}'.format(lot['id'])
-    )
-    self.assertEqual(response.json['data'].get('status'), 'active.pending')
-
-    response = self.app.patch_json(
-        '/lots/{}'.format(lot['id']),
-        {'data': {'status': 'waiting'}}
     )
     self.assertEqual(response.status, '200 OK')
-
-    response = self.app.get(
-        '/lots/{}'.format(lot['id'])
-    )
-    self.assertEqual(response.json['data'].get('status'), 'waiting')
-
-    response = self.app.patch_json(
-        '/lots/{}'.format(lot['id']),
-        {'data': {'status': 'active.pending'}}
-    )
-    self.assertEqual(response.status, '200 OK')
-
-    response = self.app.get(
-        '/lots/{}'.format(lot['id'])
-    )
+    self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'].get('status'), 'active.pending')
+    # =======================================================================
 
+    # Move status from 'active.pending' to 'active.inauction' for administrator ==============
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
         {'data': {'status': 'active.inauction'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.inauction')
+    # =======================================================================
 
+    # Check status change for 'active.pending'  ===================================
     response = self.app.get(
         '/lots/{}'.format(lot['id'])
-    )
-    self.assertEqual(response.json['data'].get('status'), 'active.inauction')
-
-    response = self.app.patch_json(
-        '/lots/{}'.format(lot['id']),
-        {'data': {'status': 'active.pending'}}
     )
     self.assertEqual(response.status, '200 OK')
-
-    response = self.app.get(
-        '/lots/{}'.format(lot['id'])
-    )
-    self.assertEqual(response.json['data'].get('status'), 'active.pending')
-
-    response = self.app.patch_json(
-        '/lots/{}'.format(lot['id']),
-        {'data': {'status': 'active.inauction'}}
-    )
-    self.assertEqual(response.status, '200 OK')
-
-    response = self.app.get(
-        '/lots/{}'.format(lot['id'])
-    )
+    self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'].get('status'), 'active.inauction')
+    # =======================================================================
 
+    # Move status from 'active.inauction' to 'sold' for administrator ==============
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
         {'data': {'status': 'sold'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'sold')
+    # =======================================================================
 
+    # Check status change for 'sold'  ===================================
     response = self.app.get(
         '/lots/{}'.format(lot['id'])
     )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'].get('status'), 'sold')
+    # =======================================================================
 
+    # Move status from 'sold' to 'active.inauction' for administrator ==============
     response = self.app.patch_json('/lots/{}'.format(
         lot['id']), {'data': {'status': 'active.inauction'}}, status=403)
 
     self.assertEqual(response.status, '403 Forbidden')
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['errors'][0]['description'], u"Can't update lot in current (sold) status")
+    # =======================================================================
 
-
-def change_lot_statuses_bot2(self):
+def change_invalid_status_for_admin(self):
     response = self.app.get('/lots')
     self.assertEqual(response.status, '200 OK')
     self.assertEqual(len(response.json['data']), 0)
-
-    self.app.authorization = ('Basic', ('broker', ''))
-
-    draft_lot = deepcopy(self.initial_data)
-    draft_lot['status'] = 'draft'
-
-    response = self.app.post_json('/lots', {'data': draft_lot})
+    waiting_lot = deepcopy(self.initial_data)
+    waiting_lot['status'] = 'waiting'
+    response = self.app.post_json('/lots', {'data': waiting_lot})
     self.assertEqual(response.status, '201 Created')
     lot = response.json['data']
-    token = response.json['access']['token']
-    self.assertEqual(lot.get('status', ''), 'draft')
+    self.assertEqual(lot.get('status', ''), 'waiting')
+
     response = self.app.get('/lots/{}'.format(lot['id']))
     self.assertEqual(response.status, '200 OK')
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'], lot)
 
+    self.app.authorization = ('Basic', ('administrator', ''))
+
+    # Move status from 'waiting' to 'invalid' for administrator ==============
     response = self.app.patch_json(
-        '/lots/{}?acc_token={}'.format(lot['id'], token),
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'invalid'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'invalid')
+    # =======================================================================
+
+    # Check status change for 'invalid'  ===================================
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'].get('status'), 'invalid')
+    # =======================================================================
+
+    # Move status from 'invalid' to 'waiting' for administrator ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
         {'data': {'status': 'waiting'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'waiting')
+    # =======================================================================
 
+    # Check status change for 'waiting'  ===================================
     response = self.app.get(
         '/lots/{}'.format(lot['id'])
     )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'].get('status'), 'waiting')
+    # =======================================================================
+
+
+def change_active_pending_status_for_admin(self):
+    response = self.app.get('/lots')
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(len(response.json['data']), 0)
+    waiting_lot = deepcopy(self.initial_data)
+    waiting_lot['status'] = 'waiting'
+    response = self.app.post_json('/lots', {'data': waiting_lot})
+    self.assertEqual(response.status, '201 Created')
+    lot = response.json['data']
+    self.assertEqual(lot.get('status', ''), 'waiting')
+
+    response = self.app.get('/lots/{}'.format(lot['id']))
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'], lot)
 
     self.app.authorization = ('Basic', ('bot1', ''))
 
+    # Move status from 'waiting' to 'active.pending' for bot1 ==============
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
         {'data': {'status': 'active.pending'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.pending')
+    # =======================================================================
 
+    # Check status change for 'active.pending'  ===================================
     response = self.app.get(
         '/lots/{}'.format(lot['id'])
     )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'].get('status'), 'active.pending')
+    # =======================================================================
+
+    self.app.authorization = ('Basic', ('administrator', ''))
+
+    # Move status from 'active.pending' to 'waiting' for administrator ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'waiting'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'waiting')
+    # =======================================================================
+
+    # Check status change for 'waiting'  ===================================
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'].get('status'), 'waiting')
+    # =======================================================================
+
+    # Move status from 'waiting' to 'active.pending' for administrator ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.pending'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.pending')
+    # =======================================================================
+
+    # Check status change for 'active.pending'  ===================================
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'].get('status'), 'active.pending')
+    # =======================================================================
+
+
+
+def change_active_inauction_status_for_admin(self):
+    response = self.app.get('/lots')
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(len(response.json['data']), 0)
+    waiting_lot = deepcopy(self.initial_data)
+    waiting_lot['status'] = 'waiting'
+    response = self.app.post_json('/lots', {'data': waiting_lot})
+    self.assertEqual(response.status, '201 Created')
+    lot = response.json['data']
+    self.assertEqual(lot.get('status', ''), 'waiting')
+
+    response = self.app.get('/lots/{}'.format(lot['id']))
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'], lot)
+
+    self.app.authorization = ('Basic', ('administrator', ''))
+
+    # Move status from 'waiting' to 'active.pending' for administrator ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.pending'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.pending')
+    # =======================================================================
+
+    # Check status change for 'active.pending'  ===================================
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'].get('status'), 'active.pending')
+    # =======================================================================
 
     self.app.authorization = ('Basic', ('bot2', ''))
 
+    # Move status from 'active.pending' to 'active.inauction' for bot2 ==============
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
         {'data': {'status': 'active.inauction'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.inauction')
+    # =======================================================================
 
+    # Check status change for 'active.inauction'  ===================================
     response = self.app.get(
         '/lots/{}'.format(lot['id'])
     )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'].get('status'), 'active.inauction')
+    # =======================================================================
 
+    self.app.authorization = ('Basic', ('administrator', ''))
+
+  # Move status from 'active.inauction' to 'active.pending' for administrator ==============
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
         {'data': {'status': 'active.pending'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.pending')
+    # =======================================================================
 
+    # Check status change for 'active.pending'  ===================================
     response = self.app.get(
         '/lots/{}'.format(lot['id'])
     )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['data'].get('status'), 'active.pending')
+    # =======================================================================
 
+    # Move status from 'active.pending' to 'active.inauction' for administrator ==============
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
         {'data': {'status': 'active.inauction'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.inauction')
+    # =======================================================================
 
+    # Check status change for 'active.pending'  ===================================
     response = self.app.get(
         '/lots/{}'.format(lot['id'])
-    )
-    self.assertEqual(response.json['data'].get('status'), 'active.inauction')
-
-    response = self.app.patch_json(
-        '/lots/{}'.format(lot['id']),
-        {'data': {'status': 'sold'}}
     )
     self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'].get('status'), 'active.inauction')
+    # =======================================================================
 
-    response = self.app.get(
-        '/lots/{}'.format(lot['id'])
-    )
-    self.assertEqual(response.json['data'].get('status'), 'sold')
 
+
+def change_sold_status_bot2(self):
+    response = self.app.get('/lots')
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(len(response.json['data']), 0)
+    waiting_lot = deepcopy(self.initial_data)
+    waiting_lot['status'] = 'waiting'
+    response = self.app.post_json('/lots', {'data': waiting_lot})
+    self.assertEqual(response.status, '201 Created')
+    lot = response.json['data']
+    token = response.json['access']['token']
+    self.assertEqual(lot.get('status', ''), 'waiting')
+
+    response = self.app.get('/lots/{}'.format(lot['id']))
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'], lot)
+
+    self.app.authorization = ('Basic', ('bot2', ''))
+
+    # Move status from 'waiting' to 'active.pending' for bot2 ==============
     response = self.app.patch_json(
         '/lots/{}'.format(lot['id']),
         {'data': {'status': 'active.inauction'}}, status=403
@@ -1234,4 +1365,219 @@ def change_lot_statuses_bot2(self):
     self.assertEqual(response.status, '403 Forbidden')
     self.assertEqual(response.content_type, 'application/json')
     self.assertEqual(response.json['status'], 'error')
+    # =======================================================================
 
+    self.app.authorization = ('Basic', ('bot1', ''))
+
+    # Move status from 'waiting' to 'active.pending' for bot1 ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.pending'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.pending')
+    # =======================================================================
+
+    # Check status change for 'active.pending'  ===================================
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'].get('status'), 'active.pending')
+    # =======================================================================
+
+    self.app.authorization = ('Basic', ('bot2', ''))
+
+    # Move status from 'active.pending' to 'active.inauction' for bot2 ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.inauction'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.inauction')
+    # =======================================================================
+
+    # Check status change for 'active.pending'  ===================================
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'].get('status'), 'active.inauction')
+    # =======================================================================
+
+    # Move status from 'active.inauction' to 'sold' for bot2 ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'sold'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'sold')
+    # =======================================================================
+
+    # Check status change for 'sold'  ===================================
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'].get('status'), 'sold')
+    # =======================================================================
+
+    # Move status from 'sold' to 'active.inauction' for bot2 ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.inauction'}}, status=403
+    )
+    self.assertEqual(response.status, '403 Forbidden')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['status'], 'error')
+    # =======================================================================
+
+
+def change_other_statuses_bot2(self):
+    response = self.app.get('/lots')
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(len(response.json['data']), 0)
+    waiting_lot = deepcopy(self.initial_data)
+    waiting_lot['status'] = 'waiting'
+    response = self.app.post_json('/lots', {'data': waiting_lot})
+    self.assertEqual(response.status, '201 Created')
+    lot = response.json['data']
+    token = response.json['access']['token']
+    self.assertEqual(lot.get('status', ''), 'waiting')
+
+    response = self.app.get('/lots/{}'.format(lot['id']))
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'], lot)
+
+    self.app.authorization = ('Basic', ('bot2', ''))
+
+    # Move status from 'waiting' to 'draft' for bot2 ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'draft'}}, status=403
+    )
+    self.assertEqual(response.status, '403 Forbidden')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['status'], 'error')
+    # =======================================================================
+
+    # Move status from 'waiting' to 'invalid' for bot2 ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'invalid'}}, status=403
+    )
+    self.assertEqual(response.status, '403 Forbidden')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['status'], 'error')
+    # =======================================================================
+
+    self.app.authorization = ('Basic', ('bot1', ''))
+
+    # Move status from 'waiting' to 'active.pending' for bot1 ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.pending'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.pending')
+    # =======================================================================
+
+    # Check status change for 'active.pending'  ===================================
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'].get('status'), 'active.pending')
+    # =======================================================================
+
+    self.app.authorization = ('Basic', ('bot2', ''))
+
+    # Move status from 'active.pending' to 'active.inauction' for bot2 ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.inauction'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.inauction')
+    # =======================================================================
+
+    # Check status change for 'active.inauction'  ===================================
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'].get('status'), 'active.inauction')
+    # =======================================================================
+
+    # Move status from 'active.inauction' to 'active.pending' for bot2 ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.pending'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'active.pending')
+    # =======================================================================
+
+    # Check status change for 'active.pending'  ===================================
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'].get('status'), 'active.pending')
+    # =======================================================================
+
+    # Move status from 'active.pending' to 'dissolved' for bot2 ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'dissolved'}}, status=403
+    )
+    self.assertEqual(response.status, '403 Forbidden')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['status'], 'error')
+    # =======================================================================
+
+    self.app.authorization = ('Basic', ('administrator', ''))
+
+    # Move status from 'active.pending' to 'dissolved' for administrator ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'dissolved'}}
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data']['status'], 'dissolved')
+    # =======================================================================
+
+    # Check status change for 'dissolved'  ===================================
+    response = self.app.get(
+        '/lots/{}'.format(lot['id'])
+    )
+    self.assertEqual(response.status, '200 OK')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['data'].get('status'), 'dissolved')
+    # =======================================================================
+
+    self.app.authorization = ('Basic', ('bot2', ''))
+
+    # Move status from 'dissolved' to 'active.pending' for bot2 ==============
+    response = self.app.patch_json(
+        '/lots/{}'.format(lot['id']),
+        {'data': {'status': 'active.pending'}}, status=403
+    )
+    self.assertEqual(response.status, '403 Forbidden')
+    self.assertEqual(response.content_type, 'application/json')
+    self.assertEqual(response.json['status'], 'error')
+    # =======================================================================
