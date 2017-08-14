@@ -23,12 +23,10 @@ from openregistry.lots.basic.tests.lot_blanks import (
     check_lot_assets,
     change_delete_terminated_status_for_admin,
     change_dissolved_terminated_status_for_admin,
-    # change_lot_statuses_bot2,
     change_sold_terminated_status_for_admin,
     change_invalid_status_for_admin,
     change_active_pending_status_for_admin,
-    change_sold_status_bot2,
-    change_other_statuses_bot2,
+    change_active_inauction_status_for_admin,
 )
 
 
@@ -56,12 +54,10 @@ class LotResourceTest(BaseLotWebTest):
     test_check_lot_assets = snitch(check_lot_assets)
     test_change_delete_terminated_status_for_admin = snitch(change_delete_terminated_status_for_admin)
     test_change_dissolved_terminated_status_for_admin = snitch(change_dissolved_terminated_status_for_admin)
-    # test_change_change_lot_statuses_bot2 = snitch(change_lot_statuses_bot2)
     test_change_sold_terminated_status_for_admin = snitch(change_sold_terminated_status_for_admin)
     test_change_active_pending_status_for_admin = snitch(change_active_pending_status_for_admin)
+    test_change_active_inauction_status_for_admin = snitch(change_active_inauction_status_for_admin)
     test_change_invalid_status_for_admin = snitch(change_invalid_status_for_admin)
-    test_change_sold_status_bot2 = snitch(change_sold_status_bot2)
-    test_change_other_statuses_bot2 = snitch(change_other_statuses_bot2)
 
 
 def suite():
