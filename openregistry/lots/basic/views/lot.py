@@ -15,11 +15,9 @@ from openregistry.lots.core.utils import (
 
 from openregistry.lots.core.validation import (
     validate_patch_lot_data,
-    validate_lot_status_update_in_terminated_status
 )
 
 from openregistry.lots.basic.validation import (
-    validate_change_lot_status,
     validate_lot_status_update_in_terminated_status_for_admin
     )
 
@@ -27,7 +25,6 @@ patch_lot_validators = (
     validate_patch_lot_data,
     validate_terminated_statuses,
     validate_change_status,
-    validate_lot_status_update_in_terminated_status,
     validate_lot_status_update_in_terminated_status_for_admin,
 )
 
