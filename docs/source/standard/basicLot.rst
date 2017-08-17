@@ -91,6 +91,8 @@ Schema
     
     The additional parameter with a value ``test``.
     
+.. _lots_workflow:
+
 Lots Workflow
 ==============
 
