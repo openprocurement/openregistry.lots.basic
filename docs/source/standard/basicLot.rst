@@ -91,6 +91,42 @@ Schema
     
     The additional parameter with a value ``test``.
     
+Lots Workflow
+==============
+
+.. graphviz::
+
+    digraph G {
+            node [style=filled, color=lightgrey];
+            edge[style=dashed];
+            "draft" -> "pending";
+            edge[style=dashed]
+            "pending" -> "deleted";
+            edge[style=dashed];
+            "pending" -> "verification";
+            edge[style=solid];
+            "verification" -> "pending";
+            edge[style=solid];
+            "verification" -> "active.saleable";
+            edge[style=dashed];
+            "active.saleable" -> "dissolved";
+            edge[style=solid];
+            "active.saleable" -> "active.awaiting";
+            edge[style=solid];
+            "active.awaiting" -> "active.saleable";
+            edge[style=solid];
+            "active.awaiting" -> "active.auction";
+            edge[style=solid];
+            "active.auction" -> "sold";
+    }
+
+
+Legend
+--------
+
+   * dashed line - user action
+    
+   * solid line - action is done automatically
     
 .. _value:
 
