@@ -25,6 +25,14 @@ Contents:
    overview
    standard/index
    lotsWorkflow
+   tutorial
+   lots
+   authentication
+   cluster
+   options
+   performance
+   dates
+   errors
 
 * :ref:`Authentication <openprocurementapi:authentication>`
 * :ref:`Responses <openprocurementapi:errors>`
