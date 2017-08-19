@@ -18,7 +18,7 @@ Lots Workflow
             edge[style=solid];
             "verification" -> "active.salable";
             edge[style=dashed];
-            "active.saleable" -> "dissolved";
+            "active.salable" -> "dissolved";
             edge[style=solid];
             "active.saleable" -> "active.awaiting";
             edge[style=solid];
