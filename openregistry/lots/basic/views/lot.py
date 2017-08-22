@@ -16,9 +16,14 @@ from openregistry.lots.core.validation import (
     validate_patch_lot_data,
 )
 
+from openregistry.lots.basic.validation import (
+    validate_lot_empty_assets,
+)
+
 patch_lot_validators = (
     validate_patch_lot_data,
-    validate_change_status
+    validate_change_status,
+    validate_lot_empty_assets,
 )
 
 
