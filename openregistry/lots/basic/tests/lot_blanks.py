@@ -2,9 +2,9 @@
 from copy import deepcopy
 from uuid import uuid4
 
-from openregistry.api.utils import get_now
-from openregistry.api.constants import ROUTE_PREFIX
-from openregistry.api.tests.base import create_blacklist
+from openprocurement.api.utils import get_now
+from openprocurement.api.constants import ROUTE_PREFIX
+from openprocurement.api.tests.base import create_blacklist
 
 from openregistry.lots.basic.models import Lot
 from openregistry.lots.basic.constants import STATUS_CHANGES
