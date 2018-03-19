@@ -2,8 +2,8 @@
 import os
 import unittest
 
-from openregistry.api.tests.base import BaseWebTest, snitch
-from openregistry.api.tests.blanks.mixins import ResourceTestMixin
+from openprocurement.api.tests.base import BaseWebTest, snitch
+from openprocurement.api.tests.blanks.mixins import ResourceTestMixin
 from openregistry.lots.basic.tests.base import (
     test_lot_data, BaseLotWebTest
 )

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from openregistry.api.tests.base import PrefixedRequestClass, DumpsTestAppwebtest
+from openprocurement.api.tests.base import PrefixedRequestClass, DumpsTestAppwebtest
 from openregistry.lots.basic.tests.base import BaseLotWebTest
 
 
