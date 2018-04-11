@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from openprocurement.api.utils import raise_operation_error
+from openregistry.lots.core.utils import raise_operation_error
 
 
 def validate_document_operation_in_not_allowed_lot_status(request, error_handler, **kwargs):
