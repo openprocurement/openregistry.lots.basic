@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from openprocurement.api.utils import (
+from openregistry.lots.core.utils import (
     get_file,
     update_file_content_type,
     json_view,
@@ -10,7 +10,7 @@ from openregistry.lots.core.utils import (
     save_lot, oplotsresource, apply_patch,
 )
 
-from openprocurement.api.validation import (
+from openregistry.lots.core.validation import (
     validate_file_upload,
     validate_document_data,
     validate_patch_document_data,

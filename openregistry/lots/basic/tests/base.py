@@ -6,7 +6,7 @@ from uuid import uuid4
 from openregistry.lots.core.tests.base import (
     BaseLotWebTest as BaseLWT
 )
-from openprocurement.api.tests.blanks.json_data import test_lot_data
+from openregistry.lots.core.tests.blanks.json_data import test_lot_data
 
 
 class BaseLotWebTest(BaseLWT):

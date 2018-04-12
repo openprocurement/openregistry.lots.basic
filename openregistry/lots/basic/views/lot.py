@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from openprocurement.api.utils import (
+from openregistry.lots.core.utils import (
     json_view,
     context_unpack,
     APIResource
 )
-from openprocurement.api.validation import (
+from openregistry.lots.core.validation import (
     validate_change_status,
 )
 

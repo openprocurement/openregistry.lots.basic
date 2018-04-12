@@ -2,12 +2,12 @@
 import unittest
 from copy import deepcopy
 
-from openprocurement.api.tests.blanks.mixins import ResourceDocumentTestMixin
+from openregistry.lots.core.tests.blanks.mixins import ResourceDocumentTestMixin
 from openregistry.lots.basic.tests.base import (
     LotContentWebTest
 )
-from openprocurement.api.tests.blanks.json_data import test_document_data
-from openprocurement.api.constants import DOCUMENT_TYPES
+from openregistry.lots.core.tests.blanks.json_data import test_document_data
+from openregistry.lots.core.constants import DOCUMENT_TYPES
 
 
 class LotDocumentWithDSResourceTest(LotContentWebTest, ResourceDocumentTestMixin):

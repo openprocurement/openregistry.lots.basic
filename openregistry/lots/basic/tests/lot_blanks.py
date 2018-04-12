@@ -2,13 +2,12 @@
 from copy import deepcopy
 from uuid import uuid4
 
-from openprocurement.api.utils import get_now
-from openprocurement.api.constants import ROUTE_PREFIX
-from openprocurement.api.tests.base import create_blacklist
+from openregistry.lots.core.utils import get_now
+from openregistry.lots.core.constants import (ROUTE_PREFIX, LOT_STATUSES)
+from openregistry.lots.core.tests.base import create_blacklist
 
 from openregistry.lots.basic.models import Lot
 from openregistry.lots.basic.constants import STATUS_CHANGES
-from openregistry.lots.core.constants import LOT_STATUSES
 
 ROLES = ['lot_owner', 'Administrator', 'concierge', 'convoy']
 STATUS_BLACKLIST = create_blacklist(STATUS_CHANGES, LOT_STATUSES, ROLES)
