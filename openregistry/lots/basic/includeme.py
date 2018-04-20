@@ -5,7 +5,7 @@ from openregistry.lots.basic.models import Lot, IBasicLot
 from openregistry.lots.basic.adapters import BasicLotConfigurator
 
 
-def includeme(config):
+def includeme(config, plugin_config=None):
     config.add_lotType(Lot)
     config.scan("openregistry.lots.basic.views")
     config.scan("openregistry.lots.basic.subscribers")
