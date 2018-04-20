@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from pyramid.interfaces import IRequest
-from openregistry.lots.core.interfaces import IContentConfigurator
+from openregistry.lots.core.interfaces import IContentConfigurator, ILotManager
 from openregistry.lots.basic.models import Lot, IBasicLot
-from openregistry.lots.basic.adapters import BasicLotConfigurator
+from openregistry.lots.basic.adapters import BasicLotConfigurator, BasicLotManagerAdapter
 
 
 def includeme(config):
@@ -12,3 +12,6 @@ def includeme(config):
     config.registry.registerAdapter(BasicLotConfigurator,
                                     (IBasicLot, IRequest),
                                     IContentConfigurator)
+    config.registry.registerAdapter(BasicLotManagerAdapter,
+                                    (IBasicLot, ),
+                                    ILotManager)

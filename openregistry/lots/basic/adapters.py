@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from openregistry.lots.core.adapters import LotConfigurator
+from openregistry.lots.core.adapters import LotConfigurator, LotManagerAdapter
+
 from .constants import STATUS_CHANGES
 
 
@@ -8,3 +9,10 @@ class BasicLotConfigurator(LotConfigurator):
 
     name = "Basic Lot configurator"
     available_statuses = STATUS_CHANGES
+
+
+class BasicLotManagerAdapter(LotManagerAdapter):
+    name = 'Basic Lot Manager'
+
+    def create_lot(self, request):
+        pass
