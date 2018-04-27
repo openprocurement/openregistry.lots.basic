@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from openregistry.lots.core.adapters import LotConfigurator, LotManagerAdapter
+from openregistry.lots.core.validation import (
+    validate_post_lot_role,
 
+)
 from .constants import STATUS_CHANGES
 
 
@@ -13,6 +16,8 @@ class BasicLotConfigurator(LotConfigurator):
 
 class BasicLotManagerAdapter(LotManagerAdapter):
     name = 'Basic Lot Manager'
-
+    create_validation = (
+        validate_post_lot_role,
+    )
     def create_lot(self, request):
-        pass
+        self._validate(request, self.create_validation)
