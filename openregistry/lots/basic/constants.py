@@ -10,8 +10,14 @@ STATUS_CHANGES = {
     "pending": {
         "editing_permissions": ["lot_owner", "Administrator"],
         "next_status": {
-            "deleted": ["lot_owner", "Administrator"],
+            "pending.deleted": ["lot_owner", "Administrator"],
             "verification": ["lot_owner", "Administrator"]
+        }
+    },
+    "pending.deleted": {
+        "editing_permissions": ["concierge", "Administrator"],
+        "next_status": {
+            "deleted": ["concierge", "Administrator"],
         }
     },
     "deleted": {
