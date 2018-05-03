@@ -21,3 +21,6 @@ class BasicLotManagerAdapter(LotManagerAdapter):
     )
     def create_lot(self, request):
         self._validate(request, self.create_validation)
+
+    def change_lot(self, request):
+        pass
