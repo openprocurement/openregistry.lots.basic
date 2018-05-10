@@ -19,6 +19,7 @@ class BasicLotManagerAdapter(LotManagerAdapter):
     create_validation = (
         validate_post_lot_role,
     )
+
     def create_lot(self, request):
         self._validate(request, self.create_validation)
 

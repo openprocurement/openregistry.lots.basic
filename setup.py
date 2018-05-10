@@ -25,8 +25,11 @@ docs_requires = requires + [
 setup(name='openregistry.lots.basic',
       version=version,
       description="",
-      long_description=open("README.rst").read() + "\n" +
-                       open(os.path.join("docs", "HISTORY.txt")).read(),
+      long_description=(
+          open("README.rst").read() +
+          "\n" +
+          open(os.path.join("docs", "HISTORY.txt")).read()
+      ),
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
       classifiers=[
