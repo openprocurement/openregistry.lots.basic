@@ -6,7 +6,6 @@ from openregistry.lots.basic.adapters import BasicLotConfigurator, BasicLotManag
 
 
 def includeme(config, plugin_config=None):
-    config.add_lotType(Lot)
     config.scan("openregistry.lots.basic.views")
     config.scan("openregistry.lots.basic.subscribers")
     config.registry.registerAdapter(BasicLotConfigurator,
@@ -15,3 +14,9 @@ def includeme(config, plugin_config=None):
     config.registry.registerAdapter(BasicLotManagerAdapter,
                                     (IBasicLot, ),
                                     ILotManager)
+    
+    lot_types = plugin_config.get('aliases', [])
+    if plugin_config.get('use_default', False):
+        lot_types.append('basic')
+    for lt in lot_types:
+        config.add_lotType(Lot, lt)

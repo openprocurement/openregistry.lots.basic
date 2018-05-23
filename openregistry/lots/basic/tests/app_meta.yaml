@@ -5,7 +5,8 @@ plugins:
       lots.core:
         plugins:
           lots.basic:
-
+            use_default: True
+            aliases: [someType]
 config:
   auth:
     type: file

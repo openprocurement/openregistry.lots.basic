@@ -13,3 +13,4 @@ class IBasicLot(ILot):
 class Lot(BaseLot):
     lotType = StringType(default="basic")
     lotIdentifier = StringType(required=True, min_length=1)
+    _internal_type = 'basic'

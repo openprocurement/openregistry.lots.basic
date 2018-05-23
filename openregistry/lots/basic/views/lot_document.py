@@ -42,7 +42,7 @@ patch_validators = (
 @oplotsresource(name='basic:Lot Documents',
                 collection_path='/lots/{lot_id}/documents',
                 path='/lots/{lot_id}/documents/{document_id}',
-                lotType='basic',
+                _internal_type='basic',
                 description="Lot related binary files (PDFs, etc.)")
 class LotDocumentResource(APIResource):
 
