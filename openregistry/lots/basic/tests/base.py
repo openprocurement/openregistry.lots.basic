@@ -16,7 +16,6 @@ class BaseLotWebTest(BaseLWT):
     def setUp(self):
         self.initial_data = deepcopy(test_lot_data)
         self.initial_data['assets'] = [uuid4().hex]
-        self.initial_data['lotType'] = 'someType'
         super(BaseLotWebTest, self).setUp()
 
 
