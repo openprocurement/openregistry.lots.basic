@@ -3,10 +3,10 @@ from pyramid.interfaces import IRequest
 from openregistry.lots.core.interfaces import IContentConfigurator, ILotManager
 from openregistry.lots.basic.models import Lot, IBasicLot
 from openregistry.lots.basic.adapters import BasicLotConfigurator, BasicLotManagerAdapter
+from openregistry.lots.basic.constants import DEFAULT_LOT_TYPE
 
 
 def includeme(config, plugin_config=None):
-    config.add_lotType(Lot)
     config.scan("openregistry.lots.basic.views")
     config.scan("openregistry.lots.basic.subscribers")
     config.registry.registerAdapter(BasicLotConfigurator,
@@ -15,3 +15,9 @@ def includeme(config, plugin_config=None):
     config.registry.registerAdapter(BasicLotManagerAdapter,
                                     (IBasicLot, ),
                                     ILotManager)
+
+    lot_types = plugin_config.get('aliases', [])
+    if plugin_config.get('use_default', False):
+        lot_types.append(DEFAULT_LOT_TYPE)
+    for lt in lot_types:
+        config.add_lotType(Lot, lt)

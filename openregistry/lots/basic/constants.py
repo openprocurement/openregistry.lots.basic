@@ -82,3 +82,6 @@ STATUS_CHANGES = {
         "next_status": {}
     }
 }
+
+
+DEFAULT_LOT_TYPE = 'basic'
