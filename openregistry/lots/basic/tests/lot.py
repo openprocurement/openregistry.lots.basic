@@ -4,9 +4,16 @@ import unittest
 
 from openregistry.lots.basic.tests.base import BaseWebTest
 from openregistry.lots.core.tests.base import snitch
-from openregistry.lots.core.tests.blanks.mixins import ResourceTestMixin
+from openregistry.lots.core.tests.blanks.mixins import (
+    ResourceTestMixin,
+    ExtractCredentialsMixin
+)
 from openregistry.lots.basic.tests.base import (
     test_lot_data, BaseLotWebTest
+)
+
+from openregistry.lots.basic.tests.base import (
+    LotContentWebTest
 )
 from openregistry.lots.basic.tests.lot_blanks import (
     # LotResourceTest
@@ -54,6 +61,10 @@ class LotResourceTest(BaseLotWebTest, ResourceTestMixin):
     test_20_check_pending_sold_lot = snitch(change_pending_sold_lot)
     test_21_check_recomposed_lot = snitch(change_recomposed_lot)
     test_22_change_pending_deleted_lot = snitch(change_pending_deleted_lot)
+
+
+class LotExtractCredentialsTest(LotContentWebTest, ExtractCredentialsMixin):
+    pass
 
 
 def suite():
