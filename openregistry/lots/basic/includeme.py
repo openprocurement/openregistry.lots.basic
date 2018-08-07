@@ -21,3 +21,6 @@ def includeme(config, plugin_config=None):
         lot_types.append(DEFAULT_LOT_TYPE)
     for lt in lot_types:
         config.add_lotType(Lot, lt)
+
+    # add accreditation level
+    config.registry.accreditation['lot'][Lot._internal_type] = plugin_config['accreditation']
