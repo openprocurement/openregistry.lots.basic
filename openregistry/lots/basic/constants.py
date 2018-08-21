@@ -85,3 +85,6 @@ STATUS_CHANGES = {
 
 
 DEFAULT_LOT_TYPE = 'basic'
+
+DEFAULT_LEVEL_OF_ACCREDITATION = {'create': [1],
+                                  'edit': [2]}

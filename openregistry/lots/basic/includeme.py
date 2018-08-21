@@ -3,7 +3,10 @@ from pyramid.interfaces import IRequest
 from openregistry.lots.core.interfaces import IContentConfigurator, ILotManager
 from openregistry.lots.basic.models import Lot, IBasicLot
 from openregistry.lots.basic.adapters import BasicLotConfigurator, BasicLotManagerAdapter
-from openregistry.lots.basic.constants import DEFAULT_LOT_TYPE
+from openregistry.lots.basic.constants import (
+    DEFAULT_LOT_TYPE,
+    DEFAULT_LEVEL_OF_ACCREDITATION
+)
 
 
 def includeme(config, plugin_config=None):
@@ -21,3 +24,9 @@ def includeme(config, plugin_config=None):
         lot_types.append(DEFAULT_LOT_TYPE)
     for lt in lot_types:
         config.add_lotType(Lot, lt)
+
+    # add accreditation level
+    if not plugin_config.get('accreditation'):
+        config.registry.accreditation['lot'][Lot._internal_type] = DEFAULT_LEVEL_OF_ACCREDITATION
+    else:
+        config.registry.accreditation['lot'][Lot._internal_type] = plugin_config['accreditation']
